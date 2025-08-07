@@ -1,4 +1,4 @@
 # Ignore the 'data' folder and its contents
 data/
-daw_data/
+raw_data/
 results/
