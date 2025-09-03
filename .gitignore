@@ -2,3 +2,62 @@
 data/
 raw_data/
 results/
+
+# ================================================================
+# .gitignore - code 폴더의 내용만 업로드하기 위한 설정
+# ================================================================
+
+# 모든 파일과 폴더를 기본적으로 무시
+*
+
+# code 폴더와 그 안의 모든 내용은 포함
+!code/
+!code/**
+
+# Git 관련 파일들은 포함 (필수)
+!.gitignore
+!README.md
+
+# ================================================================
+# 추가 제외 항목들 (code 폴더 안에서도 제외할 것들)
+# ================================================================
+
+# Python 관련
+code/**/__pycache__/
+code/**/*.pyc
+code/**/*.pyo
+code/**/*.pyd
+code/**/.Python
+code/**/env/
+code/**/venv/
+code/**/ENV/
+code/**/.env
+
+# Jupyter Notebook 체크포인트
+code/**/.ipynb_checkpoints/
+
+# 데이터 파일들 (용량이 큰 경우)
+code/**/*.csv
+code/**/*.xlsx
+code/**/*.pkl
+code/**/*.h5
+code/**/*.hdf5
+
+# 결과 폴더들 (용량이 큰 경우 제외하고 싶다면)
+# code/**/results*/
+# code/**/output*/
+
+# 로그 파일들
+code/**/*.log
+
+# MacOS 관련
+code/**/.DS_Store
+
+# Windows 관련
+code/**/Thumbs.db
+code/**/Desktop.ini
+
+# 임시 파일들
+code/**/*~
+code/**/*.tmp
+code/**/*.temp
