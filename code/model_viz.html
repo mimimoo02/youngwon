@@ -260,22 +260,6 @@
             text-align: center;
         }
 
-        .flow-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .flow-step {
-            flex: 1;
-            min-width: 150px;
-            text-align: center;
-            position: relative;
-            border-radius: 0;
-        }
-
         .flow-step::after {
             content: '→';
             position: absolute;
@@ -289,6 +273,29 @@
         .flow-step:last-child::after {
             display: none;
         }
+
+        .flow-container {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* 7칸 고정 */
+    gap: 20px;
+    overflow-x: auto; /* 작아지면 스크롤 */
+}
+
+        .flow-step {
+            min-width: 140px;  /* 너무 좁아짐 방지 */
+            text-align: center;
+            position: relative;
+            border-radius: 0;
+        }
+
+        /* 모바일에서 세로 스택이 필요하면 이렇게 */
+        @media (max-width: 768px) {
+            .flow-container {
+                grid-template-columns: 1fr; /* 세로로 1칸 */
+            }
+            .flow-step::after { display: none; }
+        }
+
 
         .step-icon {
             width: 80px;
@@ -471,6 +478,42 @@
             </div>
         </div>
 
+        <!-- 데이터 분할 방법 표 -->
+        <div class="cv-visualization">
+            <h2>데이터 분할 방법</h2>
+            <table class="model-table" style="margin-top:10px;">
+                <thead>
+                    <tr>
+                        <th>분할 방법</th>
+                        <th>함수</th>
+                        <th>특징</th>
+                        <th>적용 Task</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Temporal Split</td>
+                        <td><span class="param-badge">split_data_temporal()</span></td>
+                        <td>시계열 순서 유지, 앞 80% 학습 / 뒤 20% 테스트</td>
+                        <td>회귀/분류</td>
+                    </tr>
+                    <tr>
+                        <td>Random Split</td>
+                        <td><span class="param-badge">split_data_random()</span></td>
+                        <td>단순 랜덤 샘플링 (80:20)</td>
+                        <td>회귀</td>
+                    </tr>
+                    <tr>
+                        <td>Stratified Random Split</td>
+                        <td><span class="param-badge">split_data_random(stratify=y)</span></td>
+                        <td>클래스 분포 유지한 랜덤 샘플링</td>
+                        <td>분류</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
         <!-- 모델 설정: 회귀 -->
         <h2 style="margin-top:20px;">회귀(Regression) 모델 설정</h2>
         <table class="model-table" style="margin-top:10px;">
@@ -612,24 +655,6 @@
             </tr>
             </tbody>
         </table>
-
-        <!-- 베스트 모델 선정 로직 -->
-        <div class="feature-category" style="border-left-color:#ffd89b">
-            <h3>베스트 모델 선정</h3>
-            <p style="margin:0 0 10px 0;">96개 결과 중 <strong>회귀=R²</strong>, <strong>분류=F1_weighted</strong> 기준으로 센터×태스크별 최적 모델(총 8개)을 선정.</p>
-            <pre style="white-space:pre-wrap; background:#f8f9fa; padding:12px; border:1px solid #e9ecef; overflow:auto;"><code>for center in centers:
-            for task in ['regression', 'classification']:
-                center_task_data = results_df[(results_df['center'] == center) & (results_df['task'] == task)]
-                if len(center_task_data) == 0:
-                    continue
-                if task == 'regression':
-                    best_model = center_task_data.loc[center_task_data['R2'].idxmax()]
-                    print(f"{center} 회귀: {best_model['model']} ({best_model['split_method']}) - R2: {best_model['R2']:.4f}")
-                else:
-                    best_model = center_task_data.loc[center_task_data['F1_weighted'].idxmax()]
-                    print(f"{center} 분류: {best_model['model']} ({best_model['split_method']}) - F1: {best_model['F1_weighted']:.4f}")
-                best_models.append(best_model.to_dict())</code></pre>
-        </div>
         </div>
 
         <!-- 모델링 프로세스 플로우 (업데이트 버전) -->
@@ -659,12 +684,17 @@
                 <div class="flow-step">
                     <div class="step-icon">5</div>
                     <div class="step-title">교차 검증</div>
-                    <div class="step-desc">5-Fold CV<br>시계열 분할</div>
+                    <div class="step-desc">3-Fold CV<br>시계열 분할</div>
                 </div>
                 <div class="flow-step">
                     <div class="step-icon">6</div>
                     <div class="step-title">성능 평가</div>
                     <div class="step-desc">다양한 지표<br>안정성 검증</div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-icon">7</div>
+                    <div class="step-title">모델 해석</div>
+                    <div class="step-desc">Feature Importance<br>SHAP & LIME</div>
                 </div>
             </div>
         </div>
