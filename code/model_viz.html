@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>일별 하수처리량 예측을 위한 회귀, 분류 복합 모델 시각화</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -12,7 +14,8 @@
         }
 
         body {
-            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-weight: 600; /* SemiBold */
             background: white;
             padding: 20px;
             line-height: 1.6;
@@ -37,6 +40,7 @@
             margin-bottom: 25px;
             font-size: 24px;
             text-align: center;
+            font-weight: 600;
         }
 
         .feature-grid {
@@ -47,7 +51,7 @@
         }
 
         .feature-card {
-            background: #667eea;
+            background: #3B38A0; /* 표 헤더 색상 적용 */
             color: white;
             padding: 20px;
             border-radius: 0;
@@ -61,30 +65,30 @@
 
         /* 카드 색상 개별 배경 단색 처리 */
         .feature-card:nth-child(2) {
-            background: #f093fb;
+            background: #B2B0E8; /* 함수 색상 적용 */
         }
         .feature-card:nth-child(3) {
-            background: #4facfe;
+            background: #3B38A0;
         }
         .feature-card:nth-child(4) {
-            background: #43e97b;
+            background: #B2B0E8;
         }
         .feature-card:nth-child(5) {
-            background: #fa709a;
+            background: #3B38A0;
         }
         .feature-card:nth-child(6) {
-            background: #30cfd0;
+            background: #B2B0E8;
         }
 
         .feature-count {
             font-size: 36px;
-            font-weight: bold;
+            font-weight: 700; /* Bold */
             margin-bottom: 10px;
         }
 
         .feature-name {
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
             opacity: 0.95;
         }
 
@@ -102,6 +106,7 @@
             margin-bottom: 25px;
             font-size: 24px;
             text-align: center;
+            font-weight: 600;
         }
 
         .feature-category {
@@ -109,13 +114,14 @@
             padding: 20px;
             background: white;
             border-radius: 0;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid #3B38A0; /* 표 헤더 색상 적용 */
         }
 
         .feature-category h3 {
-            color: #667eea;
+            color: #3B38A0; /* 표 헤더 색상 적용 */
             margin-bottom: 15px;
             font-size: 18px;
+            font-weight: 600;
         }
 
         .feature-list {
@@ -130,6 +136,7 @@
             padding: 6px 12px;
             border-radius: 0;
             font-size: 13px;
+            font-weight: 600;
             border: 1px solid #dee2e6;
         }
 
@@ -147,6 +154,7 @@
             margin-bottom: 25px;
             font-size: 24px;
             text-align: center;
+            font-weight: 600;
         }
 
         .model-table {
@@ -155,30 +163,37 @@
         }
 
         .model-table th {
-            background: #667eea;
+            background: #3B38A0; /* 표 헤더 색상 */
             color: white;
             padding: 12px;
-            text-align: center;
-            font-weight: 500;
+            text-align: left;
+            font-weight: 600;
         }
 
         .model-table td {
             padding: 12px;
             border-bottom: 1px solid #e9ecef;
+            font-weight: 600;
         }
 
         .model-table tr:hover {
             background: white;
         }
-
         .param-badge {
-            background: #e3f2fd;
-            color: #1976d2;
+            background: transparent; /* 배경 투명 */
+            color: #1A2A80; /* 함수 색상을 텍스트 색상으로 */
+            border: 1px solid #B2B0E8; /* 함수 색상으로 테두리 */
             padding: 3px 8px;
             border-radius: 0;
             font-size: 12px;
+            font-weight: 600;
             display: inline-block;
             margin: 2px;
+            white-space: nowrap; /* 줄바꿈 방지 */
+            vertical-align: top; /* 상단 정렬 */
+            width: auto; /* 자동 너비 */
+            min-width: 0; /* 최소 너비 제거 */
+            box-sizing: border-box; /* 패딩 포함 */
         }
 
         /* 교차 검증 시각화 */
@@ -195,6 +210,7 @@
             margin-bottom: 25px;
             font-size: 24px;
             text-align: center;
+            font-weight: 600;
         }
 
         .cv-diagram {
@@ -211,7 +227,7 @@
 
         .fold-label {
             width: 80px;
-            font-weight: 500;
+            font-weight: 600;
             color: #495057;
         }
 
@@ -225,23 +241,23 @@
         }
 
         .train-period {
-            background: #667eea;
+            background: #3B38A0; /* 표 헤더 색상 */
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-size: 12px;
-            font-weight: 500;
+            font-weight: 600;
         }
 
         .test-period {
-            background: #ffd89b;
+            background: #B2B0E8; /* 함수 색상 */
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #19547b;
+            color: #262E5A;
             font-size: 12px;
-            font-weight: 500;
+            font-weight: 600;
         }
 
         /* 프로세스 플로우 */
@@ -258,6 +274,7 @@
             margin-bottom: 25px;
             font-size: 24px;
             text-align: center;
+            font-weight: 600;
         }
 
         .flow-step::after {
@@ -267,7 +284,7 @@
             top: 50%;
             transform: translateY(-50%);
             font-size: 24px;
-            color: #667eea;
+            color: #3B38A0; /* 표 헤더 색상 */
         }
 
         .flow-step:last-child::after {
@@ -275,40 +292,42 @@
         }
 
         .flow-container {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr); /* 7칸 고정 */
-    gap: 20px;
-    overflow-x: auto; /* 작아지면 스크롤 */
-}
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            margin-top: 20px;
+        }
 
         .flow-step {
-            min-width: 140px;  /* 너무 좁아짐 방지 */
+            min-width: 140px;
             text-align: center;
             position: relative;
             border-radius: 0;
+            background: #f5f7ff;
+            padding: 20px;
+            border-radius: 12px;
         }
 
         /* 모바일에서 세로 스택이 필요하면 이렇게 */
         @media (max-width: 768px) {
             .flow-container {
-                grid-template-columns: 1fr; /* 세로로 1칸 */
+                grid-template-columns: 1fr;
             }
             .flow-step::after { display: none; }
         }
-
 
         .step-icon {
             width: 80px;
             height: 80px;
             margin: 0 auto 15px;
-            background: #667eea;
-            border-radius: 0;
+            background: #3B38A0; /* 표 헤더 색상 */
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-size: 24px;
-            font-weight: bold;
+            font-weight: 700;
         }
 
         .step-title {
@@ -320,6 +339,7 @@
         .step-desc {
             font-size: 13px;
             color: #6c757d;
+            font-weight: 500;
         }
 
         /* 레전드 */
@@ -344,8 +364,7 @@
             width: 20px;
             height: 20px;
             border-radius: 0;
-            /* train-period color */
-            background: #667eea;
+            background: #3B38A0; /* 표 헤더 색상 */
         }
 
         @media (max-width: 768px) {
@@ -657,48 +676,116 @@
         </table>
         </div>
 
-        <!-- 모델링 프로세스 플로우 (업데이트 버전) -->
-        <div class="process-flow">
-            <h2>다음날 하수처리량 예측 모델링 프로세스</h2>
-            <div class="flow-container">
-                <div class="flow-step">
-                    <div class="step-icon">1</div>
-                    <div class="step-title">데이터 수집</div>
-                    <div class="step-desc">기상, 하수처리,인허가<br>생활인구, 하천 데이터</div>
-                </div>
-                <div class="flow-step">
-                    <div class="step-icon">2</div>
-                    <div class="step-title">피처 엔지니어링</div>
-                    <div class="step-desc">33개 피처 생성<br>데이터 전처리</div>
-                </div>
-                <div class="flow-step">
-                    <div class="step-icon">3</div>
-                    <div class="step-title">모델 학습 & 튜닝</div>
-                    <div class="step-desc">96개 모델 학습<br>Grid/Random Search</div>
-                </div>
-                <div class="flow-step">
-                    <div class="step-icon">4</div>
-                    <div class="step-title">베스트 모델 선정</div>
-                    <div class="step-desc">센터×태스크별<br>최적 모델 8개</div>
-                </div>
-                <div class="flow-step">
-                    <div class="step-icon">5</div>
-                    <div class="step-title">교차 검증</div>
-                    <div class="step-desc">3-Fold CV<br>시계열 분할</div>
-                </div>
-                <div class="flow-step">
-                    <div class="step-icon">6</div>
-                    <div class="step-title">성능 평가</div>
-                    <div class="step-desc">다양한 지표<br>안정성 검증</div>
-                </div>
-                <div class="flow-step">
-                    <div class="step-icon">7</div>
-                    <div class="step-title">모델 해석</div>
-                    <div class="step-desc">Feature Importance<br>SHAP & LIME</div>
-                </div>
-            </div>
+        <!-- 최적 모델: 회귀 -->
+        <div class="model-comparison" id="best-regression">
+        <h2>다음날 하수처리량 최적모델(회귀)</h2>
+        <table class="model-table" style="margin-top:10px;">
+            <thead>
+            <tr>
+                <th>물재생센터</th>
+                <th>모델</th>
+                <th>베스트 파라미터</th>
+                <th>분할</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>난지</td>
+                <td>CatBoost</td>
+                <td>
+                <span class="param-badge">depth=6</span>
+                <span class="param-badge">iterations=100</span>
+                <span class="param-badge">learning_rate=0.1</span>
+                </td>
+                <td>random</td>
+            </tr>
+            <tr>
+                <td>중랑</td>
+                <td>LightGBM</td>
+                <td>
+                <span class="param-badge">learning_rate=0.2</span>
+                <span class="param-badge">max_depth=3</span>
+                <span class="param-badge">n_estimators=100</span>
+                </td>
+                <td>random</td>
+            </tr>
+            <tr>
+                <td>서남</td>
+                <td>CatBoost</td>
+                <td>
+                <span class="param-badge">depth=6</span>
+                <span class="param-badge">iterations=100</span>
+                <span class="param-badge">learning_rate=0.1</span>
+                </td>
+                <td>random</td>
+            </tr>
+            <tr>
+                <td>탄천</td>
+                <td>CatBoost</td>
+                <td>
+                <span class="param-badge">depth=6</span>
+                <span class="param-badge">iterations=100</span>
+                </td>
+                <td>random</td>
+            </tr>
+            </tbody>
+        </table>
         </div>
 
-    </div>
-</body>
-</html>
+        <!-- 최적 모델: 분류 -->
+        <div class="model-comparison" id="best-regression">
+        <h2>다음날 하수처리량 최적모델(분류)</h2>
+        <table class="model-table" style="margin-top:10px;">
+            <thead>
+            <tr>
+                <th>물재생센터</th>
+                <th>모델</th>
+                <th>베스트 파라미터</th>
+                <th>분할</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>난지</td>
+                <td>GradientBoost</td>
+                <td>
+                <span class="param-badge">max_depth=5</span>
+                <span class="param-badge">n_estimators=50</span>
+                <span class="param-badge">n_estimators=0.1</span>
+                </td>
+                <td>random</td>
+            </tr>
+            <tr>
+                <td>중랑</td>
+                <td>RandomForest</td>
+                <td>
+                <span class="param-badge">class_weight=None</span>
+                <span class="param-badge">max_depth=20</span>
+                <span class="param-badge">min_samples_split=2</span>
+                <span class="param-badge">n_estimators=50</span>
+                </td>
+                <td>random</td>
+            </tr>
+            <tr>
+                <td>서남</td>
+                <td>CatBoost</td>
+                <td>
+                <span class="param-badge">depth=6</span>
+                <span class="param-badge">iterations=100</span>
+                <span class="param-badge">learning_rate=0.2</span>
+                </td>
+                <td>random</td>
+            </tr>
+            <tr>
+                <td>탄천</td>
+                <td>XGBoost</td>
+                <td>
+                <span class="param-badge">max_depth=6</span>
+                <span class="param-badge">learning_rate=0.2</span>
+                <span class="param-badge">n_estimators=50</span>
+                </td>
+                <td>random</td>
+            </tr>
+            </tbody>
+        </table>
+        </div>
