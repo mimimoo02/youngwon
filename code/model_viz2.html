@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>머신러닝 파이프라인</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .process-flow {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        h2 {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            font-size: 2.2em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .flow-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            justify-items: center;
+        }
+        
+        .flow-step {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            width: 100%;
+            max-width: 280px;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .flow-step:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        
+        .step-icon {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin: 0 auto 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .step-title {
+            color: white;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        
+        .step-desc {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95em;
+            line-height: 1.5;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        .step-highlight {
+            background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+            color: #2d3436;
+        }
+        
+        .step-highlight .step-icon {
+            background: linear-gradient(135deg, #00b894, #00a085);
+        }
+        
+        .step-highlight .step-title,
+        .step-highlight .step-desc {
+            color: #2d3436;
+            text-shadow: none;
+        }
+        
+        .correction-note {
+            background: rgba(255, 107, 107, 0.1);
+            border: 2px solid rgba(255, 107, 107, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 30px;
+            color: white;
+            text-align: center;
+        }
+        
+        .correction-note h3 {
+            color: #ff6b6b;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .process-flow {
+                padding: 20px;
+            }
+            
+            h2 {
+                font-size: 1.8em;
+            }
+            
+            .flow-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="process-flow">
+        <h2>다음날 하수처리량 예측 모델링 프로세스 (수정된 순서)</h2>
+        <div class="flow-container">
+            <div class="flow-step">
+                <div class="step-icon">1</div>
+                <div class="step-title">데이터 수집</div>
+                <div class="step-desc">기상, 하수처리, 인허가<br>생활인구, 하천 데이터<br>수집 및 통합</div>
+            </div>
+            
+            <div class="flow-step">
+                <div class="step-icon">2</div>
+                <div class="step-title">피처 엔지니어링</div>
+                <div class="step-desc">33개 피처 생성<br>데이터 전처리<br>결측치 처리</div>
+            </div>
+            
+            <div class="flow-step step-highlight">
+                <div class="step-icon">3</div>
+                <div class="step-title">데이터 분할</div>
+                <div class="step-desc">Train/Test 분할<br>시계열 vs 랜덤 분할<br>교차검증 준비</div>
+            </div>
+            
+            <div class="flow-step">
+                <div class="step-icon">4</div>
+                <div class="step-title">모델 학습 & 튜닝</div>
+                <div class="step-desc">96개 모델 학습<br>Grid/Random Search<br>3-Fold CV 적용</div>
+            </div>
+            
+            <div class="flow-step">
+                <div class="step-icon">5</div>
+                <div class="step-title">성능 평가</div>
+                <div class="step-desc">다양한 평가 지표<br>회귀: R², RMSE, MAPE<br>분류: F1, Accuracy, AUC</div>
+            </div>
+            
+            <div class="flow-step">
+                <div class="step-icon">6</div>
+                <div class="step-title">베스트 모델 선정</div>
+                <div class="step-desc">센터×태스크별<br>최적 모델 8개 선정<br>성능 기준 선별</div>
+            </div>
+            
+            <div class="flow-step step-highlight">
+                <div class="step-icon">7</div>
+                <div class="step-title">베스트 모델 재학습</div>
+                <div class="step-desc">선정된 모델로<br>재학습 및 최종 검증<br>안정성 확인</div>
+            </div>
+            
+            <div class="flow-step">
+                <div class="step-icon">8</div>
+                <div class="step-title">시각화 & 해석</div>
+                <div class="step-desc">Feature Importance<br>SHAP & LIME 분석<br>결과 시각화</div>
+            </div>
+        </div>
+        
+        <div class="correction-note">
+            <h3>🔍 주요 수정 사항</h3>
+            <p><strong>3단계 "데이터 분할"</strong>과 <strong>7단계 "베스트 모델 재학습"</strong>이 추가되어<br>
+            더 정확한 머신러닝 파이프라인 순서를 반영합니다.</p>
+        </div>
+    </div>
+</body>
+</html>

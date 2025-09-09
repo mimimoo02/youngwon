@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>일별 하수처리량 예측을 위한 회귀, 분류 복합 모델 시각화</title>
+
+    <!-- Pretendard -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+
+    <!-- ✅ MathJax: 수식 렌더링 -->
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']],
+          processEscapes: true
+        },
+        options: {
+          skipHtmlTags: ['script','noscript','style','textarea','pre','code']
+        }
+      };
+    </script>
+    <script id="MathJax-script" async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-weight: 600; /* SemiBold */
+            background: white;
+            padding: 20px;
+            line-height: 1.6;
+            color: #1f2937;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        /* 공통 카드 */
+        .feature-overview,
+        .feature-details,
+        .model-comparison,
+        .cv-visualization,
+        .process-flow {
+            background: white;
+            border-radius: 0;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .feature-overview h2,
+        .feature-details h2,
+        .model-comparison h2,
+        .cv-visualization h2,
+        .process-flow h2 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 24px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        /* 피처 구성 시각화 */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .feature-card {
+            background: #3B38A0; /* 표 헤더 색상 */
+            color: white;
+            padding: 20px;
+            border-radius: 0;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        .feature-card:hover { transform: translateY(-5px); }
+        .feature-card:nth-child(2) { background: #B2B0E8; }
+        .feature-card:nth-child(3) { background: #3B38A0; }
+        .feature-card:nth-child(4) { background: #B2B0E8; }
+        .feature-card:nth-child(5) { background: #3B38A0; }
+        .feature-card:nth-child(6) { background: #B2B0E8; }
+
+        .feature-count { font-size: 36px; font-weight: 700; margin-bottom: 10px; }
+        .feature-name { font-size: 14px; font-weight: 600; opacity: 0.95; }
+
+        /* 피처 상세 설명 */
+        .feature-category {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: white;
+            border-radius: 0;
+            border-left: 4px solid #3B38A0; /* 표 헤더 색상 */
+        }
+        .feature-category h3 {
+            color: #3B38A0;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .feature-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .feature-tag {
+            background: white;
+            color: #495057;
+            padding: 6px 12px;
+            border-radius: 0;
+            font-size: 13px;
+            font-weight: 600;
+            border: 1px solid #dee2e6;
+        }
+
+        /* 표 */
+        .model-table { width: 100%; border-collapse: collapse; }
+        .model-table th {
+            background: #3B38A0; /* 표 헤더 */
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            vertical-align: top;
+        }
+        .model-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+            font-weight: 600;
+            vertical-align: top;
+        }
+        .model-table tr:hover { background: white; }
+
+        /* 파라미터 배지 */
+        .param-badge {
+            background: transparent;
+            color: #B2B0E8; /* 함수 색상을 텍스트로 */
+            border: 1px solid #B2B0E8;
+            padding: 3px 8px;
+            border-radius: 0;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            margin: 2px;
+            white-space: nowrap;
+            vertical-align: top;
+            width: auto;
+            min-width: 0;
+            box-sizing: border-box;
+        }
+
+        /* 교차 검증 시각화 (타이틀용) */
+        .cv-diagram { display: flex; flex-direction: column; gap: 15px; }
+        .cv-fold { display: flex; align-items: center; gap: 15px; }
+        .fold-label { width: 80px; font-weight: 600; color: #495057; }
+        .fold-timeline {
+            flex: 1; display: flex; height: 40px; border-radius: 0; overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .train-period {
+            background: #3B38A0; display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 12px; font-weight: 600;
+        }
+        .test-period {
+            background: #B2B0E8; display: flex; align-items: center; justify-content: center;
+            color: #262E5A; font-size: 12px; font-weight: 600;
+        }
+
+        /* 프로세스 플로우 (옵션) */
+        .flow-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; margin-top: 20px; }
+        .flow-step { min-width: 140px; text-align: center; position: relative; background: #f5f7ff; padding: 20px; border-radius: 12px; }
+        .flow-step::after {
+            content: '→'; position: absolute; right: -25px; top: 50%; transform: translateY(-50%);
+            font-size: 24px; color: #3B38A0;
+        }
+        .flow-step:last-child::after { display: none; }
+        .step-icon {
+            width: 80px; height: 80px; margin: 0 auto 15px; background: #3B38A0; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: 700;
+        }
+        .step-title { font-weight: 600; color: #2c3e50; margin-bottom: 8px; }
+        .step-desc { font-size: 13px; color: #6c757d; font-weight: 500; }
+
+        /* 레전드 (옵션) */
+        .legend { margin-top: 20px; padding: 15px; background: white; border-radius: 0; display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
+        .legend-item { display: flex; align-items: center; gap: 8px; }
+        .legend-color { width: 20px; height: 20px; border-radius: 0; background: #3B38A0; }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .feature-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+            .flow-step::after { display: none; }
+            .flow-container { grid-template-columns: 1fr; gap: 16px; }
+        }
+
+        /* 인쇄 스타일 */
+        @media print {
+            body { background: white; }
+            .feature-overview, .feature-details, .model-comparison, .cv-visualization, .process-flow {
+                box-shadow: none; border: 1px solid #dee2e6; page-break-inside: avoid; border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 피처 구성 개요 -->
+        <div class="feature-overview">
+            <h2>다음날 하수처리량 예측 모델을 위한 피처 구성 (총 33개)</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-count">14</div>
+                    <div class="feature-name">기상·체감·습도/온도</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-count">8</div>
+                    <div class="feature-name">강수 랙·누적</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-count">4</div>
+                    <div class="feature-name">시간적 패턴</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-count">7</div>
+                    <div class="feature-name">수요·지역 특성</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 피처 상세 분류 -->
+        <div class="feature-details">
+            <h2>피처 카테고리별 상세 구성</h2>
+
+            <div class="feature-category">
+                <h3>기상·체감·습도/온도 (14)</h3>
+                <div class="feature-list">
+                    <span class="feature-tag">불쾌지수(DI)</span>
+                    <span class="feature-tag">불쾌지수등급</span>
+                    <span class="feature-tag">일_일강수량(mm)</span>
+                    <span class="feature-tag">일_최저기온(°C)</span>
+                    <span class="feature-tag">일_평균기온(°C)</span>
+                    <span class="feature-tag">일_최고기온(°C)</span>
+                    <span class="feature-tag">일_평균풍속(m/s)</span>
+                    <span class="feature-tag">일_최대순간풍속(m/s)</span>
+                    <span class="feature-tag">최저습도(%)</span>
+                    <span class="feature-tag">평균습도(%)</span>
+                    <span class="feature-tag">최고습도(%)</span>
+                    <span class="feature-tag">습도표준편차</span>
+                    <span class="feature-tag">일교차</span>
+                    <span class="feature-tag">체감온도(°C)</span>
+                </div>
+            </div>
+
+            <div class="feature-category">
+                <h3>강수 랙·누적 (8)</h3>
+                <div class="feature-list">
+                    <span class="feature-tag">강수량_1일전</span>
+                    <span class="feature-tag">강수량_2일전</span>
+                    <span class="feature-tag">강수량_1일_누적</span>
+                    <span class="feature-tag">강수량_2일_누적</span>
+                    <span class="feature-tag">강수량_3일_누적</span>
+                    <span class="feature-tag">강수량_5일_누적</span>
+                    <span class="feature-tag">강수량_7일_누적</span>
+                    <span class="feature-tag">폭우_여부</span>
+                </div>
+            </div>
+
+            <div class="feature-category">
+                <h3>시간적 패턴 (4)</h3>
+                <div class="feature-list">
+                    <span class="feature-tag">요일</span>
+                    <span class="feature-tag">월</span>
+                    <span class="feature-tag">계절</span>
+                    <span class="feature-tag">공휴일</span>
+                </div>
+            </div>
+
+            <div class="feature-category">
+                <h3>수요·지역 특성 (7)</h3>
+                <div class="feature-list">
+                    <span class="feature-tag">목욕장업</span>
+                    <span class="feature-tag">세탁업</span>
+                    <span class="feature-tag">수영장업</span>
+                    <span class="feature-tag">종합체육시설업</span>
+                    <span class="feature-tag">체력단련장업</span>
+                    <span class="feature-tag">하천</span>
+                    <span class="feature-tag">생활인구</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 모델 비교 / 요약 -->
+        <div class="model-comparison">
+            <h2>다음날 하수처리량 예측 모델(전체 튜닝 & 결과 요약)</h2>
+
+            <!-- 요약 배지 -->
+            <div class="feature-category" style="border-left-color:#43e97b">
+                <h3>하이퍼파라미터 튜닝 및 모델 학습 - 요약</h3>
+                <div class="feature-list" style="gap:8px;">
+                    <span class="param-badge">센터 4개</span>
+                    <span class="param-badge">분할 2종 (temporal/random)</span>
+                    <span class="param-badge">태스크 2개 (회귀/분류)</span>
+                    <span class="param-badge">모델 6개/태스크</span>
+                    <span class="param-badge">총 96개 모델 학습</span>
+                    <span class="param-badge">GridSearch/RandomizedSearch</span>
+                    <span class="param-badge">결과 저장 & 베스트 8개 선정</span>
+                </div>
+            </div>
+
+            <!-- 데이터 분할 방법 -->
+            <div class="cv-visualization">
+                <h2>데이터 분할 방법</h2>
+                <table class="model-table" style="margin-top:10px;">
+                    <thead>
+                        <tr>
+                            <th>분할 방법</th>
+                            <th>함수</th>
+                            <th>특징</th>
+                            <th>적용 Task</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Temporal Split</td>
+                            <td><span class="param-badge">split_data_temporal()</span></td>
+                            <td>시계열 순서 유지, 앞 80% 학습 / 뒤 20% 테스트</td>
+                            <td>회귀/분류</td>
+                        </tr>
+                        <tr>
+                            <td>Random Split</td>
+                            <td><span class="param-badge">split_data_random()</span></td>
+                            <td>단순 랜덤 샘플링 (80:20)</td>
+                            <td>회귀</td>
+                        </tr>
+                        <tr>
+                            <td>Stratified Random Split</td>
+                            <td><span class="param-badge">split_data_random(stratify=y)</span></td>
+                            <td>클래스 분포 유지한 랜덤 샘플링</td>
+                            <td>분류</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 회귀(Regression) 모델 설정 -->
+            <h2 style="margin-top:20px;">회귀(Regression) 모델 설정</h2>
+            <table class="model-table" style="margin-top:10px;">
+                <thead>
+                    <tr>
+                        <th>모델</th>
+                        <th>하이퍼파라미터 튜닝(탐색 범위)</th>
+                        <th>스코어링 / CV</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>LinearRegression</strong></td>
+                        <td><span class="param-badge">fit_intercept ∈ {True, False}</span></td>
+                        <td><span class="param-badge">scoring='r2'</span> <span class="param-badge">KFold(n_splits=3, shuffle=True)</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>RandomForestRegressor</strong></td>
+                        <td>
+                            <span class="param-badge">n_estimators ∈ {50,100}</span>
+                            <span class="param-badge">max_depth ∈ {10,20}</span>
+                            <span class="param-badge">min_samples_split ∈ {2,5}</span>
+                        </td>
+                        <td><span class="param-badge">scoring='r2'</span> <span class="param-badge">KFold(3, shuffle=True)</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>XGBoostRegressor</strong></td>
+                        <td>
+                            <span class="param-badge">n_estimators ∈ {50,100}</span>
+                            <span class="param-badge">max_depth ∈ {3,6}</span>
+                            <span class="param-badge">learning_rate ∈ {0.1,0.2}</span>
+                            <span class="param-badge">eval_metric='rmse'</span>
+                        </td>
+                        <td><span class="param-badge">scoring='r2'</span> <span class="param-badge">KFold(3, shuffle=True)</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>CatBoostRegressor</strong></td>
+                        <td>
+                            <span class="param-badge">iterations ∈ {50,100}</span>
+                            <span class="param-badge">depth ∈ {4,6}</span>
+                            <span class="param-badge">learning_rate ∈ {0.1,0.2}</span>
+                        </td>
+                        <td><span class="param-badge">scoring='r2'</span> <span class="param-badge">KFold(3, shuffle=True)</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>GradientBoostingRegressor</strong></td>
+                        <td>
+                            <span class="param-badge">n_estimators ∈ {50,100}</span>
+                            <span class="param-badge">max_depth ∈ {3,5}</span>
+                            <span class="param-badge">learning_rate ∈ {0.1,0.2}</span>
+                        </td>
+                        <td><span class="param-badge">scoring='r2'</span> <span class="param-badge">KFold(3, shuffle=True)</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>LightGBMRegressor</strong></td>
+                        <td>
+                            <span class="param-badge">n_estimators ∈ {50,100}</span>
+                            <span class="param-badge">max_depth ∈ {3,6}</span>
+                            <span class="param-badge">learning_rate ∈ {0.1,0.2}</span>
+                            <span class="param-badge">verbose=-1</span>
+                        </td>
+                        <td><span class="param-badge">scoring='r2'</span> <span class="param-badge">KFold(3, shuffle=True)</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- 분류(Classification) 모델 설정 -->
+            <h2 style="margin-top:20px;">분류(Classification) 모델 설정</h2>
+            <table class="model-table" style="margin-top:10px;">
+                <thead>
+                    <tr>
+                        <th>모델</th>
+                        <th>하이퍼파라미터 튜닝(탐색 범위)</th>
+                        <th>스코어링 / CV</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>LogisticRegression</strong></td>
+                        <td>
+                            <span class="param-badge">C ∈ {0.1,1,10}</span>
+                            <span class="param-badge">penalty='l2'</span>
+                            <span class="param-badge">class_weight ∈ {'balanced', None}</span>
+                            <span class="param-badge">solver='liblinear'</span>
+                            <span class="param-badge">max_iter=2000</span>
+                        </td>
+                        <td><span class="param-badge">scoring='f1_weighted'</span> <span class="param-badge">StratifiedKFold(3, shuffle=True)</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>RandomForestClassifier</strong></td>
+                        <td>
+                            <span class="param-badge">n_estimators ∈ {50,100}</span>
+                            <span class="param-badge">max_depth ∈ {10,20}</span>
+                            <span class="param-badge">min_samples_split ∈ {2,5}</span>
+                            <span class="param-badge">class_weight ∈ {'balanced', None}</span>
+                        </td>
+                        <td><span class="param-badge">scoring='f1_weighted'</span> <span class="param-badge">StratifiedKFold(3, shuffle=True)</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>XGBoostClassifier</strong></td>
+                        <td>
+                            <span class="param-badge">n_estimators ∈ {50,100}</span>
+                            <span class="param-badge">max_depth ∈ {3,6}</span>
+                            <span class="param-badge">learning_rate ∈ {0.1,0.2}</span>
+                            <span class="param-badge">eval_metric='logloss'</span>
+                        </td>
+                        <td><span class="param-badge">scoring='f1_weighted'</span> <span class="param-badge">StratifiedKFold(3, shuffle=True)</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>CatBoostClassifier</strong></td>
+                        <td>
+                            <span class="param-badge">iterations ∈ {50,100}</span>
+                            <span class="param-badge">depth ∈ {4,6}</span>
+                            <span class="param-badge">learning_rate ∈ {0.1,0.2}</span>
+                        </td>
+                        <td><span class="param-badge">scoring='f1_weighted'</span> <span class="param-badge">StratifiedKFold(3, shuffle=True)</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>GradientBoostingClassifier</strong></td>
+                        <td>
+                            <span class="param-badge">n_estimators ∈ {50,100}</span>
+                            <span class="param-badge">max_depth ∈ {3,5}</span>
+                            <span class="param-badge">learning_rate ∈ {0.1,0.2}</span>
+                        </td>
+                        <td><span class="param-badge">scoring='f1_weighted'</span> <span class="param-badge">StratifiedKFold(3, shuffle=True)</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>LightGBMClassifier</strong></td>
+                        <td>
+                            <span class="param-badge">n_estimators ∈ {50,100}</span>
+                            <span class="param-badge">max_depth ∈ {3,6}</span>
+                            <span class="param-badge">learning_rate ∈ {0.1,0.2}</span>
+                            <span class="param-badge">class_weight ∈ {'balanced', None}</span>
+                            <span class="param-badge">verbose=-1</span>
+                        </td>
+                        <td><span class="param-badge">scoring='f1_weighted'</span> <span class="param-badge">StratifiedKFold(3, shuffle=True)</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ✅ 성능 지표 (요청 순서: 회귀 → 분류) -->
+        <div class="cv-visualization">
+            <h2>회귀 모델 성능 평가 지표</h2>
+            <table class="model-table" style="margin-top:10px;">
+                <thead>
+                    <tr>
+                        <th>지표</th>
+                        <th>범위</th>
+                        <th>평가기준</th>
+                        <th>정의(수식)</th>
+                        <th>장점</th>
+                        <th>단점</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>MAE</strong></td>
+                        <td>[0,∞)</td>
+                        <td>↓</td>
+                        <td>$\text{mean}(|y - \hat{y}|)$</td>
+                        <td>해석 직관적, 이상치 영향 적음</td>
+                        <td>단위 의존</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MSE</strong></td>
+                        <td>[0,∞)</td>
+                        <td>↓</td>
+                        <td>$\text{mean}((y - \hat{y})^2)$</td>
+                        <td>큰 오차 더 강하게 패널티</td>
+                        <td>스케일 큼(제곱)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>RMSE</strong></td>
+                        <td>[0,∞)</td>
+                        <td>↓</td>
+                        <td>$\sqrt{\text{MSE}}$</td>
+                        <td>단위가 타깃과 같음</td>
+                        <td>이상치 민감</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MAPE</strong></td>
+                        <td>[0,200]%</td>
+                        <td>↓</td>
+                        <td>$\text{mean}\!\left(\frac{|y-\hat{y}|}{|y|}\right)\times 100$</td>
+                        <td>%로 직관적</td>
+                        <td>$y=0$에서 정의 불가, 작은 $y$ 민감</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SMAPE</strong></td>
+                        <td>[0,200]%</td>
+                        <td>↓</td>
+                        <td>$\text{mean}\!\left(\frac{2\cdot |y-\hat{y}|}{|y|+|\hat{y}|}\right)\times 100$</td>
+                        <td>0/0 회피, 대칭적</td>
+                        <td>값이 모두 작을 때 변동 큼</td>
+                    </tr>
+                    <tr>
+                        <td><strong>R^2</strong></td>
+                        <td>(-∞,1]</td>
+                        <td>↑</td>
+                        <td>$1 - \frac{SSE}{SST}$</td>
+                        <td>설명력 직관적</td>
+                        <td>분산 작은 구간에 취약</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="cv-visualization">
+            <h2>분류 모델 성능 평가 지표</h2>
+            <table class="model-table" style="margin-top:10px;">
+                <thead>
+                    <tr>
+                        <th>지표</th>
+                        <th>범위</th>
+                        <th>평가기준</th>
+                        <th>정의(간단식)</th>
+                        <th>장점</th>
+                        <th>단점</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Accuracy</strong></td>
+                        <td>[0,1]</td>
+                        <td>↑</td>
+                        <td>$\frac{\text{맞춘개수}}{\text{전체}}$</td>
+                        <td>직관적</td>
+                        <td>불균형에 취약</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Precision</strong></td>
+                        <td>[0,1]</td>
+                        <td>↑</td>
+                        <td>$\frac{TP}{TP + FP}$</td>
+                        <td>오경보 억제</td>
+                        <td>재현율과 트레이드오프</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Recall</strong></td>
+                        <td>[0,1]</td>
+                        <td>↑</td>
+                        <td>$\frac{TP}{TP + FN}$</td>
+                        <td>놓침 억제</td>
+                        <td>정밀도와 트레이드오프</td>
+                    </tr>
+                    <tr>
+                        <td><strong>F1</strong></td>
+                        <td>[0,1]</td>
+                        <td>↑</td>
+                        <td>$2 \cdot \frac{P \cdot R}{P + R}$</td>
+                        <td>P/R 균형</td>
+                        <td>해석이 직관적이지 않음</td>
+                    </tr>
+                    <tr>
+                        <td><strong>F1 (Macro)</strong></td>
+                        <td>[0,1]</td>
+                        <td>↑</td>
+                        <td>클래스별 F1 평균(균등 가중)</td>
+                        <td>불균형에 민감</td>
+                        <td>소수 클래스 영향 큼</td>
+                    </tr>
+                    <tr>
+                        <td><strong>F1 (Weighted)</strong></td>
+                        <td>[0,1]</td>
+                        <td>↑</td>
+                        <td>클래스별 F1을 지원수로 가중평균</td>
+                        <td>불균형에 안정적</td>
+                        <td>다수 클래스 영향 큼</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ROC-AUC</strong></td>
+                        <td>[0,1]</td>
+                        <td>↑</td>
+                        <td>ROC 면적(OVR/OVO/micro/macro)</td>
+                        <td>임계값 독립</td>
+                        <td>다중분류 해석 난이도</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 최적 모델: 회귀 -->
+        <div class="model-comparison" id="best-regression">
+            <h2>다음날 하수처리량 최적모델(회귀)</h2>
+            <table class="model-table" style="margin-top:10px;">
+                <thead>
+                    <tr>
+                        <th>물재생센터</th>
+                        <th>모델</th>
+                        <th>베스트 파라미터</th>
+                        <th>분할</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>난지</td>
+                        <td>CatBoost</td>
+                        <td>
+                            <span class="param-badge">depth=6</span>
+                            <span class="param-badge">iterations=100</span>
+                            <span class="param-badge">learning_rate=0.1</span>
+                        </td>
+                        <td>random</td>
+                    </tr>
+                    <tr>
+                        <td>중랑</td>
+                        <td>LightGBM</td>
+                        <td>
+                            <span class="param-badge">learning_rate=0.2</span>
+                            <span class="param-badge">max_depth=3</span>
+                            <span class="param-badge">n_estimators=100</span>
+                        </td>
+                        <td>random</td>
+                    </tr>
+                    <tr>
+                        <td>서남</td>
+                        <td>CatBoost</td>
+                        <td>
+                            <span class="param-badge">depth=6</span>
+                            <span class="param-badge">iterations=100</span>
+                            <span class="param-badge">learning_rate=0.1</span>
+                        </td>
+                        <td>random</td>
+                    </tr>
+                    <tr>
+                        <td>탄천</td>
+                        <td>CatBoost</td>
+                        <td>
+                            <span class="param-badge">depth=6</span>
+                            <span class="param-badge">iterations=100</span>
+                            <span class="param-badge">learning_rate=0.1</span>
+                        </td>
+                        <td>random</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <div class="model-comparison" id="best-classification">
+            <h2>다음날 하수처리량 최적모델(분류)</h2>
+            <table class="model-table" style="margin-top:10px;">
+                <thead>
+                    <tr><th>물재생센터</th><th>모델</th><th>베스트 파라미터</th><th>분할</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>예시</td>
+                        <td>LightGBM</td>
+                        <td><span class="param-badge">max_depth=6</span> <span class="param-badge">n_estimators=100</span></td>
+                        <td>stratified</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <div class="process-flow">
+            <h2>모델링 프로세스</h2>
+            <div class="flow-container">
+                <div class="flow-step">
+                    <div class="step-icon">1</div>
+                    <div class="step-title">데이터 정제</div>
+                    <div class="step-desc">결측/이상치 처리, 스케일/타입 정리</div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-icon">2</div>
+                    <div class="step-title">피처 엔지니어링</div>
+                    <div class="step-desc">강수 랙/누적, 체감온도, 시간/지역 변수</div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-icon">3</div>
+                    <div class="step-title">분할/튜닝</div>
+                    <div class="step-desc">Temporal/Random, Grid/Random Search</div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-icon">4</div>
+                    <div class="step-title">평가/선정</div>
+                    <div class="step-desc">회귀·분류 지표, 센터별 베스트 선정</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
