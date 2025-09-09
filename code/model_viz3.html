@@ -242,144 +242,149 @@
             </div>
 
             <!-- 회귀(Regression) 모델 설정 -->
-            <h2 style="margin-top:20px;">회귀(Regression) 모델 설정</h2>
-            <table class="model-table" style="margin-top:10px;">
-                <thead>
-                    <tr>
-                        <th>모델</th>
-                        <th>하이퍼파라미터 튜닝(탐색 범위)</th>
-                        <th>스코어링 / CV</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>LinearRegression</strong></td>
-                        <td><span class="param-badge">fit_intercept ∈ {True, False}</span></td>
-                        <td><span class="param-badge">scoring='r2'</span> <span class="param-badge">KFold(n_splits=3, shuffle=True)</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>RandomForestRegressor</strong></td>
-                        <td>
-                            <span class="param-badge">n_estimators ∈ {50,100}</span>
-                            <span class="param-badge">max_depth ∈ {10,20}</span>
-                            <span class="param-badge">min_samples_split ∈ {2,5}</span>
-                        </td>
-                        <td><span class="param-badge">scoring='r2'</span> <span class="param-badge">KFold(3, shuffle=True)</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>XGBoostRegressor</strong></td>
-                        <td>
-                            <span class="param-badge">n_estimators ∈ {50,100}</span>
-                            <span class="param-badge">max_depth ∈ {3,6}</span>
-                            <span class="param-badge">learning_rate ∈ {0.1,0.2}</span>
-                            <span class="param-badge">eval_metric='rmse'</span>
-                        </td>
-                        <td><span class="param-badge">scoring='r2'</span> <span class="param-badge">KFold(3, shuffle=True)</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>CatBoostRegressor</strong></td>
-                        <td>
-                            <span class="param-badge">iterations ∈ {50,100}</span>
-                            <span class="param-badge">depth ∈ {4,6}</span>
-                            <span class="param-badge">learning_rate ∈ {0.1,0.2}</span>
-                        </td>
-                        <td><span class="param-badge">scoring='r2'</span> <span class="param-badge">KFold(3, shuffle=True)</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>GradientBoostingRegressor</strong></td>
-                        <td>
-                            <span class="param-badge">n_estimators ∈ {50,100}</span>
-                            <span class="param-badge">max_depth ∈ {3,5}</span>
-                            <span class="param-badge">learning_rate ∈ {0.1,0.2}</span>
-                        </td>
-                        <td><span class="param-badge">scoring='r2'</span> <span class="param-badge">KFold(3, shuffle=True)</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>LightGBMRegressor</strong></td>
-                        <td>
-                            <span class="param-badge">n_estimators ∈ {50,100}</span>
-                            <span class="param-badge">max_depth ∈ {3,6}</span>
-                            <span class="param-badge">learning_rate ∈ {0.1,0.2}</span>
-                            <span class="param-badge">verbose=-1</span>
-                        </td>
-                        <td><span class="param-badge">scoring='r2'</span> <span class="param-badge">KFold(3, shuffle=True)</span></td>
-                    </tr>
-                </tbody>
-            </table>
+             <div class="cv-visualization">
+                <h2>회귀(Regression) 모델 설정</h2>
+                <table class="model-table" style="margin-top:10px;">
+                    <thead>
+                        <tr>
+                            <th>모델</th>
+                            <th>하이퍼파라미터 튜닝(탐색 범위)</th>
+                            <th>스코어링 / CV</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>LinearRegression</strong></td>
+                            <td><span class="param-badge">fit_intercept ∈ {True, False}</span></td>
+                            <td><span class="param-badge">scoring='r2'</span> <span class="param-badge">KFold(n_splits=3, shuffle=True)</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>RandomForestRegressor</strong></td>
+                            <td>
+                                <span class="param-badge">n_estimators ∈ {50,100}</span>
+                                <span class="param-badge">max_depth ∈ {10,20}</span>
+                                <span class="param-badge">min_samples_split ∈ {2,5}</span>
+                            </td>
+                            <td><span class="param-badge">scoring='r2'</span> <span class="param-badge">KFold(3, shuffle=True)</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>XGBoostRegressor</strong></td>
+                            <td>
+                                <span class="param-badge">n_estimators ∈ {50,100}</span>
+                                <span class="param-badge">max_depth ∈ {3,6}</span>
+                                <span class="param-badge">learning_rate ∈ {0.1,0.2}</span>
+                                <span class="param-badge">eval_metric='rmse'</span>
+                            </td>
+                            <td><span class="param-badge">scoring='r2'</span> <span class="param-badge">KFold(3, shuffle=True)</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>CatBoostRegressor</strong></td>
+                            <td>
+                                <span class="param-badge">iterations ∈ {50,100}</span>
+                                <span class="param-badge">depth ∈ {4,6}</span>
+                                <span class="param-badge">learning_rate ∈ {0.1,0.2}</span>
+                            </td>
+                            <td><span class="param-badge">scoring='r2'</span> <span class="param-badge">KFold(3, shuffle=True)</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>GradientBoostingRegressor</strong></td>
+                            <td>
+                                <span class="param-badge">n_estimators ∈ {50,100}</span>
+                                <span class="param-badge">max_depth ∈ {3,5}</span>
+                                <span class="param-badge">learning_rate ∈ {0.1,0.2}</span>
+                            </td>
+                            <td><span class="param-badge">scoring='r2'</span> <span class="param-badge">KFold(3, shuffle=True)</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>LightGBMRegressor</strong></td>
+                            <td>
+                                <span class="param-badge">n_estimators ∈ {50,100}</span>
+                                <span class="param-badge">max_depth ∈ {3,6}</span>
+                                <span class="param-badge">learning_rate ∈ {0.1,0.2}</span>
+                                <span class="param-badge">verbose=-1</span>
+                            </td>
+                            <td><span class="param-badge">scoring='r2'</span> <span class="param-badge">KFold(3, shuffle=True)</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
 
             <!-- 분류(Classification) 모델 설정 -->
-            <h2 style="margin-top:20px;">분류(Classification) 모델 설정</h2>
-            <table class="model-table" style="margin-top:10px;">
-                <thead>
-                    <tr>
-                        <th>모델</th>
-                        <th>하이퍼파라미터 튜닝(탐색 범위)</th>
-                        <th>스코어링 / CV</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>LogisticRegression</strong></td>
-                        <td>
-                            <span class="param-badge">C ∈ {0.1,1,10}</span>
-                            <span class="param-badge">penalty='l2'</span>
-                            <span class="param-badge">class_weight ∈ {'balanced', None}</span>
-                            <span class="param-badge">solver='liblinear'</span>
-                            <span class="param-badge">max_iter=2000</span>
-                        </td>
-                        <td><span class="param-badge">scoring='f1_weighted'</span> <span class="param-badge">StratifiedKFold(3, shuffle=True)</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>RandomForestClassifier</strong></td>
-                        <td>
-                            <span class="param-badge">n_estimators ∈ {50,100}</span>
-                            <span class="param-badge">max_depth ∈ {10,20}</span>
-                            <span class="param-badge">min_samples_split ∈ {2,5}</span>
-                            <span class="param-badge">class_weight ∈ {'balanced', None}</span>
-                        </td>
-                        <td><span class="param-badge">scoring='f1_weighted'</span> <span class="param-badge">StratifiedKFold(3, shuffle=True)</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>XGBoostClassifier</strong></td>
-                        <td>
-                            <span class="param-badge">n_estimators ∈ {50,100}</span>
-                            <span class="param-badge">max_depth ∈ {3,6}</span>
-                            <span class="param-badge">learning_rate ∈ {0.1,0.2}</span>
-                            <span class="param-badge">eval_metric='logloss'</span>
-                        </td>
-                        <td><span class="param-badge">scoring='f1_weighted'</span> <span class="param-badge">StratifiedKFold(3, shuffle=True)</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>CatBoostClassifier</strong></td>
-                        <td>
-                            <span class="param-badge">iterations ∈ {50,100}</span>
-                            <span class="param-badge">depth ∈ {4,6}</span>
-                            <span class="param-badge">learning_rate ∈ {0.1,0.2}</span>
-                        </td>
-                        <td><span class="param-badge">scoring='f1_weighted'</span> <span class="param-badge">StratifiedKFold(3, shuffle=True)</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>GradientBoostingClassifier</strong></td>
-                        <td>
-                            <span class="param-badge">n_estimators ∈ {50,100}</span>
-                            <span class="param-badge">max_depth ∈ {3,5}</span>
-                            <span class="param-badge">learning_rate ∈ {0.1,0.2}</span>
-                        </td>
-                        <td><span class="param-badge">scoring='f1_weighted'</span> <span class="param-badge">StratifiedKFold(3, shuffle=True)</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>LightGBMClassifier</strong></td>
-                        <td>
-                            <span class="param-badge">n_estimators ∈ {50,100}</span>
-                            <span class="param-badge">max_depth ∈ {3,6}</span>
-                            <span class="param-badge">learning_rate ∈ {0.1,0.2}</span>
-                            <span class="param-badge">class_weight ∈ {'balanced', None}</span>
-                            <span class="param-badge">verbose=-1</span>
-                        </td>
-                        <td><span class="param-badge">scoring='f1_weighted'</span> <span class="param-badge">StratifiedKFold(3, shuffle=True)</span></td>
-                    </tr>
-                </tbody>
-            </table>
+             <div class="cv-visualization">
+                <h2>분류(Classification) 모델 설정</h2>
+                <table class="model-table" style="margin-top:10px;">
+                    <thead>
+                        <tr>
+                            <th>모델</th>
+                            <th>하이퍼파라미터 튜닝(탐색 범위)</th>
+                            <th>스코어링 / CV</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>LogisticRegression</strong></td>
+                            <td>
+                                <span class="param-badge">C ∈ {0.1,1,10}</span>
+                                <span class="param-badge">penalty='l2'</span>
+                                <span class="param-badge">class_weight ∈ {'balanced', None}</span>
+                                <span class="param-badge">solver='liblinear'</span>
+                                <span class="param-badge">max_iter=2000</span>
+                            </td>
+                            <td><span class="param-badge">scoring='f1_weighted'</span> <span class="param-badge">StratifiedKFold(3, shuffle=True)</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>RandomForestClassifier</strong></td>
+                            <td>
+                                <span class="param-badge">n_estimators ∈ {50,100}</span>
+                                <span class="param-badge">max_depth ∈ {10,20}</span>
+                                <span class="param-badge">min_samples_split ∈ {2,5}</span>
+                                <span class="param-badge">class_weight ∈ {'balanced', None}</span>
+                            </td>
+                            <td><span class="param-badge">scoring='f1_weighted'</span> <span class="param-badge">StratifiedKFold(3, shuffle=True)</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>XGBoostClassifier</strong></td>
+                            <td>
+                                <span class="param-badge">n_estimators ∈ {50,100}</span>
+                                <span class="param-badge">max_depth ∈ {3,6}</span>
+                                <span class="param-badge">learning_rate ∈ {0.1,0.2}</span>
+                                <span class="param-badge">eval_metric='logloss'</span>
+                            </td>
+                            <td><span class="param-badge">scoring='f1_weighted'</span> <span class="param-badge">StratifiedKFold(3, shuffle=True)</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>CatBoostClassifier</strong></td>
+                            <td>
+                                <span class="param-badge">iterations ∈ {50,100}</span>
+                                <span class="param-badge">depth ∈ {4,6}</span>
+                                <span class="param-badge">learning_rate ∈ {0.1,0.2}</span>
+                            </td>
+                            <td><span class="param-badge">scoring='f1_weighted'</span> <span class="param-badge">StratifiedKFold(3, shuffle=True)</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>GradientBoostingClassifier</strong></td>
+                            <td>
+                                <span class="param-badge">n_estimators ∈ {50,100}</span>
+                                <span class="param-badge">max_depth ∈ {3,5}</span>
+                                <span class="param-badge">learning_rate ∈ {0.1,0.2}</span>
+                            </td>
+                            <td><span class="param-badge">scoring='f1_weighted'</span> <span class="param-badge">StratifiedKFold(3, shuffle=True)</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>LightGBMClassifier</strong></td>
+                            <td>
+                                <span class="param-badge">n_estimators ∈ {50,100}</span>
+                                <span class="param-badge">max_depth ∈ {3,6}</span>
+                                <span class="param-badge">learning_rate ∈ {0.1,0.2}</span>
+                                <span class="param-badge">class_weight ∈ {'balanced', None}</span>
+                                <span class="param-badge">verbose=-1</span>
+                            </td>
+                            <td><span class="param-badge">scoring='f1_weighted'</span> <span class="param-badge">StratifiedKFold(3, shuffle=True)</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+             </div>
         </div>
 
         <!-- ✅ 성능 지표 (요청 순서: 회귀 → 분류) -->
